@@ -60,3 +60,59 @@ TEST_CASE( "simplify_radial_distance: simplifies points correctly with the given
     auto new_last = simplify::simplify_radial_distance( points.begin(), points.end(), 2, &simplify::helpers::get_point_point_square_distance< int, 2 > );
     REQUIRE( std::equal( points.begin(), new_last, simplified.begin() ) );
 }
+
+// simplify_douglas_peucker
+
+TEST_CASE( "simplify_douglas_peucker: just returns the points if it has only zero, one or two points (2D)", "[simplify_douglas_peucker]" )
+{
+    using vec2i = simplify::helpers::vect< int, 2 >;
+
+    std::vector< vec2i > points {
+            { 0, 0 },
+            { 0, 1 }
+        },
+        simplified {
+            { 0, 0 },
+            { 0, 1 }
+        };
+
+    auto new_last = simplify::simplify_douglas_peucker( points.begin(), points.begin() + 0, 1, &simplify::helpers::get_point_segment_square_distance< int, 2 > );
+    REQUIRE( new_last == points.begin() );
+
+    new_last = simplify::simplify_douglas_peucker( points.begin(), points.begin() + 1, 1, &simplify::helpers::get_point_segment_square_distance< int, 2 > );
+    REQUIRE( new_last == points.begin() + 1 );
+    REQUIRE( std::equal( points.begin(), new_last, simplified.begin() ) );
+
+    new_last = simplify::simplify_douglas_peucker( points.begin(), points.begin() + 2, 1, &simplify::helpers::get_point_segment_square_distance< int, 2 > );
+    REQUIRE( new_last == points.begin() + 2 );
+    REQUIRE( std::equal( points.begin(), new_last, simplified.begin() ) );
+}
+
+TEST_CASE( "simplify_douglas_peucker: simplifies points correctly with the given tolerance (keeping both ends) (2D)", "[simplify_douglas_peucker]" )
+{
+    using vec2f = simplify::helpers::vect< float, 2 >;
+
+    std::vector< vec2f > points {
+            //                  + = kept
+            //                  - = discarded
+            //            step: 0 1 2 3
+            { -5.0f, 0.0f }, // +      
+            { -4.0f, 5.0f }, //     +  
+            { -3.0f, 4.5f }, //       -
+            { -2.0f, 4.5f }, //       -
+            { 0.0f, 5.0f },  //   +    
+            { 0.0f, 5.0f },  //     -  
+            { 2.5f, 2.5f },  //     -  
+            { 5.0f, 0.0f }   // +      
+        },
+        simplified {
+            { -5.0f, 0.0f },
+            { -4.0f, 5.0f },
+            { 0.0f, 5.0f },
+            { 5.0f, 0.0f }
+        };
+
+    auto new_last = simplify::simplify_douglas_peucker( points.begin(), points.end(), 1.0f, &simplify::helpers::get_point_segment_square_distance< float, 2 > );
+    REQUIRE( std::equal( points.begin(), new_last, simplified.begin() ) );
+}
+
