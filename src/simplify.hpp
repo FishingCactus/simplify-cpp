@@ -162,6 +162,31 @@ namespace simplify
         }
     }
 
+    template< class ForwardIt, class T, class GetPointSegmentSquareDistance >
+    ForwardIt simplify(
+        ForwardIt first,
+        ForwardIt last,
+        T tolerance,
+        GetPointSegmentSquareDistance get_point_segment_square_distance
+        )
+    {
+        return simplify_douglas_peucker( first, last, tolerance, get_point_segment_square_distance );
+    }
+
+    template< class ForwardIt, class T, class GetPointSegmentSquareDistance, class GetPointPointSquareDistance >
+    ForwardIt simplify(
+        ForwardIt first,
+        ForwardIt last,
+        T tolerance,
+        GetPointSegmentSquareDistance get_point_segment_square_distance,
+        GetPointPointSquareDistance get_point_point_square_distance
+        )
+    {
+        last = simplify_radial_distance( first, last, tolerance, get_point_point_square_distance );
+
+        return simplify_douglas_peucker( first, last, tolerance, get_point_segment_square_distance );
+    }
+
     namespace helpers
     {
         template< class T, std::size_t dimension >
@@ -282,5 +307,43 @@ namespace simplify
                 return get_point_point_square_distance( candidate, projection );
             }
         }
+
+        template< class T, std::size_t dimension >
+        T * simplify(
+            T * const first,
+            T * const last,
+            const T tolerance = static_cast< T >( 1 ),
+            const bool highest_quality = false
+            )
+        {
+            static_assert( std::is_arithmetic< T >::value, "T is not an arithmetic type" );
+
+            if ( highest_quality )
+            {
+                return ( T* ) ::simplify::simplify(
+                    reinterpret_cast< vect< T, dimension > * >( first ),
+                    reinterpret_cast< vect< T, dimension > * >( last ),
+                    tolerance,
+                    &get_point_segment_square_distance< T, dimension >
+                    );
+            }
+            else
+            {
+                return ( T* ) ::simplify::simplify(
+                    reinterpret_cast< vect< T, dimension > * >( first ),
+                    reinterpret_cast< vect< T, dimension > * >( last ),
+                    tolerance,
+                    &get_point_segment_square_distance< T, dimension >,
+                    &get_point_point_square_distance< T, dimension >
+                    );
+            }
+        }
     }
+
+    #define simplify2i helpers::simplify< int, 2 >
+    #define simplify3i helpers::simplify< int, 3 >
+    #define simplify2f helpers::simplify< float, 2 >
+    #define simplify3f helpers::simplify< float, 3 >
+    #define simplify2d helpers::simplify< double, 2 >
+    #define simplify3d helpers::simplify< double, 3 >
 }
