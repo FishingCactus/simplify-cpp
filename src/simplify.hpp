@@ -57,6 +57,37 @@ namespace simplify
         return first;
     }
 
+    template< class Iterator >
+    Iterator get_last_included(
+        Iterator first,
+        Iterator last,
+        typename std::enable_if<
+            std::is_base_of< std::bidirectional_iterator_tag, typename std::iterator_traits<Iterator>::iterator_category >::value
+            >::type * = 0
+        )
+    {
+        return last - 1;
+    }
+
+    template< class Iterator >
+    Iterator get_last_included(
+        Iterator first,
+        Iterator last,
+        typename std::enable_if<
+            !std::is_base_of< std::bidirectional_iterator_tag, typename std::iterator_traits<Iterator>::iterator_category >::value
+            >::type * = 0
+        )
+    {
+        Iterator last_included;
+
+        for ( auto it = first; it != last; ++it )
+        {
+            last_included = it;
+        }
+
+        return last_included;
+    }
+
     template< class ForwardIt, class T, class GetPointSegmentSquareDistance >
     ForwardIt simplify_douglas_peucker(
         ForwardIt first,
@@ -83,9 +114,7 @@ namespace simplify
         {
             T square_tolerance { tolerance * tolerance };
 
-            // :TODO: use something like std::last( first, last ) instead of last - 1
-
-            auto initial_range = std::make_pair( first, last - 1 );
+            auto initial_range = std::make_pair( first, get_last_included( first, last ) );
             std::stack< decltype( initial_range ) > range_to_process_table;
 
             range_to_process_table.push( initial_range );
