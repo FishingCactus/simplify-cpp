@@ -32,10 +32,11 @@ namespace simplify
         else
         {
             T square_tolerance { tolerance * tolerance };
-            ForwardIt last_kept_it { first },
-                last_item_it;
+            ForwardIt last_kept_it{ first };
 
             ++first;
+
+            ForwardIt last_item_it{ first };
 
             for( ForwardIt it = first; it != last; ++it )
             {
@@ -257,7 +258,7 @@ namespace simplify
 
             for ( std::size_t i = 0; i < dimension; ++i )
             {
-                result.values[ i ] += interpolation_parameter * ( second.values[ i ] - first.values[ i ] );
+                result.values[ i ] += T( interpolation_parameter * ( second.values[ i ] - first.values[ i ] ) );
             }
 
             return result;
