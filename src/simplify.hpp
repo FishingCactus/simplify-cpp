@@ -264,10 +264,10 @@ namespace simplify
             return result;
         }
 
-        template< class T, std::size_t dimension >
+        template< class T, class V >
         T get_point_point_square_distance(
-            const vect< T, dimension > & first,
-            const vect< T, dimension > & second
+            const V & first,
+            const V & second
             )
         {
             auto diff = second - first;
@@ -275,37 +275,37 @@ namespace simplify
             return dot( diff, diff );
         }
 
-        template< class T, std::size_t dimension >
+        template< class T, class V >
         T get_point_segment_square_distance(
-            const vect< T, dimension > & candidate,
-            const vect< T, dimension > & segment_start,
-            const vect< T, dimension > & segment_end
+            const V & candidate,
+            const V & segment_start,
+            const V & segment_end
             )
         {
-            const auto segment_square_length = get_point_point_square_distance( segment_start, segment_end );
+            const auto segment_square_length = get_point_point_square_distance< T >( segment_start, segment_end );
 
             // :TODO: use precision
 
             if ( segment_square_length == static_cast< decltype( segment_square_length ) >( 0 ) )
             {
-                return get_point_point_square_distance( candidate, segment_start );
+                return get_point_point_square_distance< T >( candidate, segment_start );
             }
 
             const double t = double( dot( candidate - segment_start, segment_end - segment_start ) ) / segment_square_length;
 
             if ( t < 0.0 )
             {
-                return get_point_point_square_distance( candidate, segment_start );
+                return get_point_point_square_distance< T >( candidate, segment_start );
             }
             else if ( t > 1.0 )
             {
-                return get_point_point_square_distance( candidate, segment_end );
+                return get_point_point_square_distance< T >( candidate, segment_end );
             }
             else
             {
-                const vect< T, dimension > projection = lerp( segment_start, segment_end, t );
+                const V projection = lerp( segment_start, segment_end, t );
 
-                return get_point_point_square_distance( candidate, projection );
+                return get_point_point_square_distance< T >( candidate, projection );
             }
         }
 
@@ -319,23 +319,25 @@ namespace simplify
         {
             static_assert( std::is_arithmetic< T >::value, "T is not an arithmetic type" );
 
+            using vec = vect< T, dimension >;
+
             if ( highest_quality )
             {
                 return ( T* ) ::simplify::simplify(
-                    reinterpret_cast< vect< T, dimension > * >( first ),
-                    reinterpret_cast< vect< T, dimension > * >( last ),
+                    reinterpret_cast< vec * >( first ),
+                    reinterpret_cast< vec * >( last ),
                     tolerance,
-                    &get_point_segment_square_distance< T, dimension >
+                    &get_point_segment_square_distance< T, vec >
                     );
             }
             else
             {
                 return ( T* ) ::simplify::simplify(
-                    reinterpret_cast< vect< T, dimension > * >( first ),
-                    reinterpret_cast< vect< T, dimension > * >( last ),
+                    reinterpret_cast< vec * >( first ),
+                    reinterpret_cast< vec * >( last ),
                     tolerance,
-                    &get_point_segment_square_distance< T, dimension >,
-                    &get_point_point_square_distance< T, dimension >
+                    &get_point_segment_square_distance< T, vec >,
+                    &get_point_point_square_distance< T, vec >
                     );
             }
         }
