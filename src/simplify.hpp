@@ -126,15 +126,15 @@ namespace simplify
             while( !range_to_process_table.empty() )
             {
                 auto range = range_to_process_table.top();
-                auto maximum = static_cast< T >( 0 );
-                ForwardIt current_maximum_it;
+                auto maximum = static_cast< T >( -1 );
+                ForwardIt current_maximum_it = range.first;
 
                 if ( to_keep_table.back() != range.first )
                     to_keep_table.push_back( range.first );
 
                 range_to_process_table.pop();
 
-                for( ForwardIt it = range.first + 1; it != range.second; ++ it )
+                for( ForwardIt it = ++current_maximum_it; it != range.second; ++ it )
                 {
                     auto square_distance = get_point_segment_square_distance( *it, *range.first, *range.second );
 

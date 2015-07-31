@@ -116,6 +116,32 @@ TEST_CASE( "simplify_douglas_peucker: simplifies points correctly with the given
     REQUIRE( std::equal( points.begin(), new_last, simplified.begin() ) );
 }
 
+TEST_CASE( "simplify_douglas_peucker: simplify aligned points properly (2D)", "[simplify_douglas_peucker]" )
+{
+    using vec2f = simplify::helpers::vect< float, 2 >;
+
+    std::vector< vec2f > points {
+            { -5.0f, -5.0f },
+            { 0.0f, 0.0f },
+            { 5.0f, 5.0f }
+        },
+        simplified_0 {
+            { -5.0f, -5.0f },
+            { 0.0f, 0.0f },
+            { 5.0f, 5.0f }
+        },
+        simplified_1 {
+            { -5.0f, -5.0f },
+            { 5.0f, 5.0f }
+        };
+
+    auto new_last = simplify::simplify_douglas_peucker( points.begin(), points.end(), 0.0f, &simplify::helpers::get_point_segment_square_distance< float, vec2f > );
+    REQUIRE( std::equal( points.begin(), new_last, simplified_0.begin() ) );
+
+    new_last = simplify::simplify_douglas_peucker( points.begin(), points.end(), 1.0f, &simplify::helpers::get_point_segment_square_distance< float, vec2f > );
+    REQUIRE( std::equal( points.begin(), new_last, simplified_1.begin() ) );
+}
+
 // simplify
 
 TEST_CASE( "simplify: simplifies points correctly with the given tolerance", "[simplify]" )
