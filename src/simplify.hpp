@@ -60,7 +60,7 @@ namespace simplify
 
     template< class Iterator >
     Iterator get_last_included(
-        Iterator first,
+        Iterator /*first*/,
         Iterator last,
         typename std::enable_if<
             std::is_base_of< std::bidirectional_iterator_tag, typename std::iterator_traits<Iterator>::iterator_category >::value
