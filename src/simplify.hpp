@@ -67,7 +67,7 @@ namespace simplify
             >::type * = 0
         )
     {
-        return last - 1;
+        return --last;
     }
 
     template< class Iterator >
