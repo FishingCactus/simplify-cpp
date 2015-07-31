@@ -15,7 +15,7 @@ namespace simplify
         GetPointPointSquareDistance get_point_point_square_distance
         )
     {
-        using VectorReference = typename std::iterator_traits< ForwardIt >::reference;
+        typedef typename std::iterator_traits< ForwardIt >::reference VectorReference;
 
         static_assert(
             std::is_same<
@@ -31,12 +31,12 @@ namespace simplify
         }
         else
         {
-            T square_tolerance { tolerance * tolerance };
-            ForwardIt last_kept_it{ first };
+            T square_tolerance = tolerance * tolerance;
+            ForwardIt last_kept_it = first;
 
             ++first;
 
-            ForwardIt last_item_it{ first };
+            ForwardIt last_item_it = first;
 
             for( ForwardIt it = first; it != last; ++it )
             {
@@ -97,7 +97,7 @@ namespace simplify
         GetPointSegmentSquareDistance get_point_segment_square_distance
         )
     {
-        using VectorReference = typename std::iterator_traits< ForwardIt >::reference;
+        typedef typename std::iterator_traits< ForwardIt >::reference VectorReference;
 
         static_assert(
             std::is_same<
@@ -113,7 +113,7 @@ namespace simplify
         }
         else
         {
-            T square_tolerance { tolerance * tolerance };
+            T square_tolerance = tolerance * tolerance;
 
             auto initial_range = std::make_pair( first, get_last_included( first, last ) );
             std::stack< decltype( initial_range ) > range_to_process_table;
@@ -319,7 +319,7 @@ namespace simplify
         {
             static_assert( std::is_arithmetic< T >::value, "T is not an arithmetic type" );
 
-            using vec = vect< T, dimension >;
+            typedef vect< T, dimension > vec;
 
             if ( highest_quality )
             {
